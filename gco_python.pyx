@@ -24,6 +24,28 @@ cdef extern from "GCoptimization.h":
         int whatLabel(int node) except +
 
 
+cdef class PyGCoptimizationGeneralGraph:
+
+    # thisptr hold a C++ instance which we're wrapping
+    cdef GCoptimizationGeneralGraph *thisptr
+
+    cdef int n_vertices
+    cdef int n_labels
+
+    def __cinit__(self, int n_vertices, int n_labels):
+        self.thisptr = new GCoptimizationGeneralGraph(n_vertices, n_labels)
+        self.n_vertices = n_vertices
+        self.n_labels = n_labels
+
+    def __dealloc__(self):
+        del self.thisptr
+
+    def setDataCost(self, np.ndarray[np.int32_t, ndim=2, mode='c'] unary_cost):
+        cdef int n_vertices = unary_cost.shape[0]
+        assert n_vertices == self.n_vertices
+        self.thisptr.setDataCost(<int*>unary_cost.data)
+
+
 def cut_simple(np.ndarray[np.int32_t, ndim=3, mode='c'] unary_cost,
         np.ndarray[np.int32_t, ndim=2, mode='c'] pairwise_cost, n_iter=5,
         algorithm='expansion'):
@@ -80,7 +102,7 @@ def cut_simple(np.ndarray[np.int32_t, ndim=3, mode='c'] unary_cost,
 def cut_simple_vh(np.ndarray[np.int32_t, ndim=3, mode='c'] unary_cost,
         np.ndarray[np.int32_t, ndim=2, mode='c'] pairwise_cost,
         np.ndarray[np.int32_t, ndim=2, mode='c'] costV,
-        np.ndarray[np.int32_t, ndim=2, mode='c'] costH, 
+        np.ndarray[np.int32_t, ndim=2, mode='c'] costH,
         n_iter=5,
         algorithm='expansion'):
     """
