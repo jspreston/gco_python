@@ -1,5 +1,10 @@
+*~
+
 gco_src
 *.py[co]
+*.so
+*.zip
+gco_python.cpp
 
 # Packages
 *.egg
