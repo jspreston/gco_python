@@ -23,17 +23,26 @@ cdef extern from "GCoptimization.h":
         void swap(int n_iterations) except +
         int whatLabel(int node) except +
 
+cdef extern from "GCoptMultiSmooth.h":
+    cdef cppclass GCoptMultiSmooth:
+        GCoptMultiSmooth(int n_vertices, int n_labels, int n_smoothFuncs) except +
+        void setDataCost(int *) except +
+        void addEdges(int *site1, int *site2, int smooth_func_id) except +
+        int addSmoothCost(int *) except +
+        void expansion(int n_iterations) except +
+        void swap(int n_iterations) except +
+        int whatLabel(int node) except +
 
-cdef class PyGCoptimizationGeneralGraph:
+cdef class PyGCoptMultiSmooth:
 
     # thisptr hold a C++ instance which we're wrapping
-    cdef GCoptimizationGeneralGraph *thisptr
+    cdef GCoptMultiSmooth *thisptr
 
     cdef int n_vertices
     cdef int n_labels
 
-    def __cinit__(self, int n_vertices, int n_labels):
-        self.thisptr = new GCoptimizationGeneralGraph(n_vertices, n_labels)
+    def __cinit__(self, int n_vertices, int n_labels, int n_smoothFuncs):
+        self.thisptr = new GCoptMultiSmooth(n_vertices, n_labels, n_smoothFuncs)
         self.n_vertices = n_vertices
         self.n_labels = n_labels
 
