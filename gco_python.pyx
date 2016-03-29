@@ -27,7 +27,7 @@ cdef extern from "GCoptMultiSmooth.h":
     cdef cppclass GCoptMultiSmooth:
         GCoptMultiSmooth(int n_vertices, int n_labels, int n_smoothFuncs) except +
         void setDataCost(int *) except +
-        void addEdges(int *site1, int *site2, int smooth_func_id) except +
+        void addEdges(int *site1, int *site2, int n_edges, int smooth_func_id) except +
         int addSmoothCost(int *) except +
         void expansion(int n_iterations) except +
         void swap(int n_iterations) except +
@@ -54,6 +54,22 @@ cdef class PyGCoptMultiSmooth:
         assert n_vertices == self.n_vertices
         self.thisptr.setDataCost(<int*>unary_cost.data)
 
+    def addSmoothCost(self, np.ndarray[np.int32_t, ndim=2, mode='c'] smooth_cost):
+        assert smooth_cost.shape[0] == self.n_labels
+        assert smooth_cost.shape[1] == self.n_labels
+        smooth_func_id = self.thisptr.addSmoothCost(<int*>smooth_cost.data)
+        return smooth_func_id
+
+    def addEdges(self,
+                 np.ndarray[np.int32_t, ndim=1, mode='c'] site1,
+                 np.ndarray[np.int32_t, ndim=1, mode='c'] site2,
+                 int smooth_func_id):
+        cdef int n_edges = site1.size
+        assert site2.size == n_edges
+        self.thisptr.addEdges(<int*>site1.data, <int*>site2.data, n_edges, smooth_func_id)
+
+    def expansion(self, int n_iterations):
+        self.thisptr.expansion(n_iterations)
 
 def cut_simple(np.ndarray[np.int32_t, ndim=3, mode='c'] unary_cost,
         np.ndarray[np.int32_t, ndim=2, mode='c'] pairwise_cost, n_iter=5,
