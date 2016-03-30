@@ -44,7 +44,9 @@ GCoptMultiSmooth::
 	for(int idx=0;idx<m_nSmoothArrays;idx++){
 	    delete m_smoothArrayList[idx];
 	}
+	m_nSmoothArrays = 0;
 	delete [] m_smoothArrayList;
+	m_smoothArrayList = NULL;
     }
 
 }
@@ -78,7 +80,7 @@ GCoptMultiSmooth::FuncID
 GCoptMultiSmooth::
 addSmoothCost(EnergyTermType *smoothArray)
 {
-    if(m_nSmoothArrays >= m_maxSmoothFuncs-1){
+    if(m_nSmoothArrays >= m_maxSmoothFuncs){
 	handleError("exceeded maximum number of edge penalty arrays");
     }
     size_t size = this->m_num_labels*this->m_num_labels;

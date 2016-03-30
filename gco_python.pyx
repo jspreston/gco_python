@@ -51,13 +51,15 @@ cdef class PyGCoptMultiSmooth:
 
     def setDataCost(self, np.ndarray[np.int32_t, ndim=2, mode='c'] unary_cost):
         cdef int n_vertices = unary_cost.shape[0]
+        cdef int n_labels = unary_cost.shape[1]
         assert n_vertices == self.n_vertices
+        assert n_labels == self.n_labels
         self.thisptr.setDataCost(<int*>unary_cost.data)
 
     def addSmoothCost(self, np.ndarray[np.int32_t, ndim=2, mode='c'] smooth_cost):
         assert smooth_cost.shape[0] == self.n_labels
         assert smooth_cost.shape[1] == self.n_labels
-        smooth_func_id = self.thisptr.addSmoothCost(<int*>smooth_cost.data)
+        cdef int smooth_func_id = self.thisptr.addSmoothCost(<int*>smooth_cost.data)
         return smooth_func_id
 
     def addEdges(self,
