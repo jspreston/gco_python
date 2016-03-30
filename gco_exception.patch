@@ -1,0 +1,24 @@
+--- orig/GCoptimization.h	2014-10-14 12:38:16.000000000 -0600
++++ gco_src/GCoptimization.h	2016-03-30 13:22:25.798903571 -0600
+@@ -106,6 +106,7 @@
+ #endif
+ 
+ #include <cstddef>
++#include <exception>
+ #include "energy.h"
+ #include "graph.cpp"
+ #include "maxflow.cpp"
+@@ -114,11 +115,12 @@
+ // Utility functions, classes, and macros
+ /////////////////////////////////////////////////////////////////////
+ 
+-class GCException {
++class GCException : public std::exception {
+ public:
+ 	const char* message;
+ 	GCException( const char* m ): message(m) { }
+ 	void Report();
++        virtual const char* what() const throw(){ return message; }
+ };
+ 
+ #ifdef _WIN32
