@@ -34,8 +34,8 @@ cdef class PyGCoptMultiSmooth:
     # thisptr hold a C++ instance which we're wrapping
     cdef GCoptMultiSmooth *thisptr
 
-    cdef int n_vertices
-    cdef int n_labels
+    cdef public int n_vertices
+    cdef public int n_labels
 
     def __cinit__(self,
                   int n_vertices,
