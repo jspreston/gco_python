@@ -1,14 +1,15 @@
 import numpy as np
 cimport numpy as np
+from libcpp cimport bool
 
 np.import_array()
 
 ctypedef np.int32_t SiteID_dtype
-ctypedef np.int32_t LabelType_dtype
+ctypedef np.int32_t LabelID_dtype
 ctypedef np.int32_t FuncID_dtype
 ctypedef np.float32_t EnergyTermType_dtype
 
-LabelType_ctype = np.NPY_INT32
+LabelID_ctype = np.NPY_INT32
 
 cdef extern from "GCoptMultiSmooth.h":
     cdef cppclass GCoptMultiSmooth:
@@ -16,11 +17,17 @@ cdef extern from "GCoptMultiSmooth.h":
         void setDataCost(EnergyTermType_dtype *) except +
         void addEdges(SiteID_dtype *site1, SiteID_dtype *site2, int n_edges, FuncID_dtype smooth_func_id) except +
         FuncID_dtype addSmoothCost(EnergyTermType_dtype *) except +
+        bool alpha_expansion(LabelID_dtype alpha_label) except +
         void expansion(int n_iterations) except +
         void swap(int n_iterations) except +
-        void whatLabel(SiteID_dtype start, SiteID_dtype count, LabelType_dtype *labeling) except +
+        void whatLabel(SiteID_dtype start, SiteID_dtype count, LabelID_dtype *labeling) except +
         EnergyTermType_dtype giveDataEnergy() except +
         EnergyTermType_dtype giveSmoothEnergy() except +
+        EnergyTermType_dtype compute_energy() except +
+        void setVerbosity(int level) except +
+        void setLabel(SiteID_dtype site, LabelID_dtype label) except +
+        void setLabels(SiteID_dtype *sites, LabelID_dtype *labels, int n_labels) except +
+        void setAllLabels(LabelID_dtype *labels) except +
 
 cdef class PyGCoptMultiSmooth:
 
@@ -30,8 +37,13 @@ cdef class PyGCoptMultiSmooth:
     cdef int n_vertices
     cdef int n_labels
 
-    def __cinit__(self, int n_vertices, int n_labels, int n_smoothFuncs):
+    def __cinit__(self,
+                  int n_vertices,
+                  int n_labels,
+                  int n_smoothFuncs,
+                  int verbosity=0):
         self.thisptr = new GCoptMultiSmooth(n_vertices, n_labels, n_smoothFuncs)
+        self.thisptr.setVerbosity(verbosity)
         self.n_vertices = n_vertices
         self.n_labels = n_labels
 
@@ -62,15 +74,37 @@ cdef class PyGCoptMultiSmooth:
     def expansion(self, int n_iterations):
         self.thisptr.expansion(n_iterations)
 
+    def alpha_expansion(self, LabelID_dtype alpha_label):
+        self.thisptr.alpha_expansion(alpha_label)
+
     def getLabeling(self):
         cdef np.npy_intp result_shape[1]
         result_shape[0] = self.n_vertices
-        cdef np.ndarray[LabelType_dtype, ndim=1] result = np.PyArray_SimpleNew(1, result_shape, LabelType_ctype)
-        self.thisptr.whatLabel(0, result.size, <LabelType_dtype*>result.data)
+        cdef np.ndarray[LabelID_dtype, ndim=1] result = np.PyArray_SimpleNew(1, result_shape, LabelID_ctype)
+        self.thisptr.whatLabel(0, result.size, <LabelID_dtype*>result.data)
         return result
 
-    def giveDataEnergy(self):
+    def dataEnergy(self):
         return self.thisptr.giveDataEnergy()
 
-    def giveSmoothEnergy(self):
+    def smoothEnergy(self):
         return self.thisptr.giveSmoothEnergy()
+
+    def energy(self):
+        ttl_en = self.thisptr.compute_energy()
+        data_en = self.thisptr.giveDataEnergy()
+        smooth_en = self.thisptr.giveSmoothEnergy()
+        return (ttl_en, data_en, smooth_en)
+
+    def setLabels(self,
+                  np.ndarray[SiteID_dtype, ndim=1, mode='c'] sites,
+                  np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels,
+                  int n_labels):
+        self.thisptr.setLabels(<SiteID_dtype*>sites.data,
+                               <LabelID_dtype*>labels.data,
+                               n_labels)
+
+    def setAllLabels(self,
+                     np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels):
+        assert labels.size == self.n_vertices
+        self.thisptr.setAllLabels(<LabelID_dtype*>labels.data)

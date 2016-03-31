@@ -33,6 +33,9 @@ public:
 
     FuncID addSmoothCost(EnergyTermType *smoothArray);
 
+    void setLabels(SiteID *sites, LabelID *labels, int n_labels);
+    void setAllLabels(LabelID *labels);
+
     friend EnergyTermType multi_smooth_func(SiteID, SiteID, LabelID, LabelID, void*);
 
 private:

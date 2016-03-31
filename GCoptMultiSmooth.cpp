@@ -90,3 +90,22 @@ addSmoothCost(EnergyTermType *smoothArray)
     m_nSmoothArrays++;
     return m_nSmoothArrays-1;
 }
+
+void
+GCoptMultiSmooth::
+setLabels(SiteID *sites, LabelID *labels, int n_labels)
+{
+    for(int idx=0; idx<n_labels; ++idx){
+	this->setLabel(sites[idx], labels[idx]);
+    }
+}
+
+void
+GCoptMultiSmooth::
+setAllLabels(LabelID *labels)
+{
+
+    memcpy(m_labeling, labels, m_num_labels*sizeof(LabelID));
+    m_labelingInfoDirty = true;
+
+}
