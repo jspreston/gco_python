@@ -31,10 +31,16 @@ public:
     // void addEdge(SiteID site1, SiteID site2, FuncID smooth_func_id);
     void addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id);
 
+    void copyDataCost(EnergyTermType *dataArray);
+
     FuncID addSmoothCost(EnergyTermType *smoothArray);
 
     void setLabels(SiteID *sites, LabelID *labels, int n_labels);
     void setAllLabels(LabelID *labels);
+
+    // accessors for debugging
+    SiteID num_sites(){ return m_num_sites; }
+    LabelID num_labels(){ return m_num_labels; }
 
     friend EnergyTermType multi_smooth_func(SiteID, SiteID, LabelID, LabelID, void*);
 
@@ -44,6 +50,7 @@ private:
     int m_maxSmoothFuncs;
     std::map<Edge, FuncID> m_edgeFuncID;
     EnergyTermType **m_smoothArrayList;
+    EnergyTermType *m_dataCost;
 };
 
 #endif // __GCOPTMULTISMOOTH_H__

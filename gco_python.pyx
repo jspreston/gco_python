@@ -14,7 +14,7 @@ LabelID_ctype = np.NPY_INT32
 cdef extern from "GCoptMultiSmooth.h":
     cdef cppclass GCoptMultiSmooth:
         GCoptMultiSmooth(int n_vertices, int n_labels, int n_smoothFuncs) except +
-        void setDataCost(EnergyTermType_dtype *) except +
+        void copyDataCost(EnergyTermType_dtype *) except +
         void addEdges(SiteID_dtype *site1, SiteID_dtype *site2, int n_edges, FuncID_dtype smooth_func_id) except +
         FuncID_dtype addSmoothCost(EnergyTermType_dtype *) except +
         bool alpha_expansion(LabelID_dtype alpha_label) except +
@@ -28,6 +28,8 @@ cdef extern from "GCoptMultiSmooth.h":
         void setLabel(SiteID_dtype site, LabelID_dtype label) except +
         void setLabels(SiteID_dtype *sites, LabelID_dtype *labels, int n_labels) except +
         void setAllLabels(LabelID_dtype *labels) except +
+        LabelID_dtype num_labels() except +
+        SiteID_dtype num_sites() except +
 
 cdef class PyGCoptMultiSmooth:
 
@@ -51,11 +53,14 @@ cdef class PyGCoptMultiSmooth:
         del self.thisptr
 
     def setDataCost(self, np.ndarray[EnergyTermType_dtype, ndim=2, mode='c'] unary_cost):
+        """
+        Copies unary_cost to internal buffer
+        """
         cdef int n_vertices = unary_cost.shape[0]
         cdef int n_labels = unary_cost.shape[1]
         assert n_vertices == self.n_vertices
         assert n_labels == self.n_labels
-        self.thisptr.setDataCost(<EnergyTermType_dtype*>unary_cost.data)
+        self.thisptr.copyDataCost(<EnergyTermType_dtype*>unary_cost.data)
 
     def addSmoothCost(self, np.ndarray[EnergyTermType_dtype, ndim=2, mode='c'] smooth_cost):
         assert smooth_cost.shape[0] == self.n_labels
@@ -98,8 +103,9 @@ cdef class PyGCoptMultiSmooth:
 
     def setLabels(self,
                   np.ndarray[SiteID_dtype, ndim=1, mode='c'] sites,
-                  np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels,
-                  int n_labels):
+                  np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels):
+        cdef int n_labels = sites.size
+        assert n_labels == labels.size
         self.thisptr.setLabels(<SiteID_dtype*>sites.data,
                                <LabelID_dtype*>labels.data,
                                n_labels)
@@ -108,3 +114,7 @@ cdef class PyGCoptMultiSmooth:
                      np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels):
         assert labels.size == self.n_vertices
         self.thisptr.setAllLabels(<LabelID_dtype*>labels.data)
+
+    def printinfo(self):
+        print 'num labels: ', self.thisptr.num_labels()
+        print 'num sites: ', self.thisptr.num_sites()

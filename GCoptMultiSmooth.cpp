@@ -26,6 +26,7 @@ GCoptMultiSmooth::EnergyTermType multi_smooth_func(GCoptMultiSmooth::SiteID s1,
 GCoptMultiSmooth::
 GCoptMultiSmooth(SiteID num_sites,LabelID num_labels,int num_smoothFuncs)
     : GCoptimizationGeneralGraph(num_sites,num_labels),
+      m_dataCost(NULL),
       m_nSmoothArrays(0),
       m_maxSmoothFuncs(num_smoothFuncs),
       m_smoothArrayList(NULL)
@@ -39,6 +40,10 @@ GCoptMultiSmooth(SiteID num_sites,LabelID num_labels,int num_smoothFuncs)
 GCoptMultiSmooth::
 ~GCoptMultiSmooth()
 {
+    if(m_dataCost){
+	delete [] m_dataCost;
+	m_dataCost = NULL;
+    }
 
     if(m_smoothArrayList){
 	for(int idx=0;idx<m_nSmoothArrays;idx++){
@@ -49,6 +54,18 @@ GCoptMultiSmooth::
 	m_smoothArrayList = NULL;
     }
 
+}
+
+//------------------------------------------------------------------
+
+void
+GCoptMultiSmooth::
+copyDataCost(EnergyTermType *dataArray)
+{
+    size_t size = this->m_num_sites*this->m_num_labels;
+    m_dataCost = new EnergyTermType[size];
+    memcpy(m_dataCost, dataArray, size*sizeof(EnergyTermType));
+    this->setDataCost(m_dataCost);
 }
 
 //------------------------------------------------------------------
@@ -85,7 +102,7 @@ addSmoothCost(EnergyTermType *smoothArray)
     }
     size_t size = this->m_num_labels*this->m_num_labels;
     EnergyTermType* table = new EnergyTermType[size];
-    memcpy(table,smoothArray,size*sizeof(LabelID));
+    memcpy(table,smoothArray,size*sizeof(EnergyTermType));
     m_smoothArrayList[m_nSmoothArrays] = table;
     m_nSmoothArrays++;
     return m_nSmoothArrays-1;
