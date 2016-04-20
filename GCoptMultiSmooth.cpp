@@ -122,7 +122,7 @@ GCoptMultiSmooth::
 setAllLabels(LabelID *labels)
 {
 
-    memcpy(m_labeling, labels, m_num_labels*sizeof(LabelID));
+    memcpy(m_labeling, labels, m_num_sites*sizeof(LabelID));
     m_labelingInfoDirty = true;
 
 }
