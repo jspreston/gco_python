@@ -15,7 +15,9 @@ files.append('GCoptMultiSmooth.cpp')
 
 files.insert(0, "gco_python.pyx")
 
-setup(cmdclass={'build_ext': build_ext},
+setup(name='gco_python',
+      version='0.01',
+      cmdclass={'build_ext': build_ext},
       ext_modules=[Extension("pygco", files, language="c++",
                              include_dirs=['.', gco_directory, numpy.get_include()],
                              library_dirs=[gco_directory],
