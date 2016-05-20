@@ -21,7 +21,7 @@ setup(name='gco_python',
       ext_modules=[Extension("pygco", files, language="c++",
                              include_dirs=['.', gco_directory, numpy.get_include()],
                              library_dirs=[gco_directory],
-                             undef_macros = [ "NDEBUG" ],
+                             # undef_macros = [ "NDEBUG" ],
                              extra_compile_args=["-fpermissive",
                                                  "-DGCO_ENERGYTERMTYPE=float",
                                                  "-DGCO_MAX_ENERGYTERM=(static_cast<GCO_ENERGYTERMTYPE>(1e10))"])])

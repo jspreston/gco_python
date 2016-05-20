@@ -1,4 +1,5 @@
 #include "GCoptMultiSmooth.h"
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Functions for the GCoptMultiSmooth, derived from GCoptimizationGeneralGraph
@@ -87,6 +88,7 @@ addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id, Energ
 	    siteA = tmp;
 	}
 	EnergyTermType w = weights ? weights[idx] : 1.0;
+	// std::cout << w << " ";
 	setNeighbors(siteA, siteB, w);
 	m_edgeFuncID[Edge(siteA, siteB)] = smooth_func_id;
     }

@@ -78,7 +78,7 @@ cdef class PyGCoptMultiSmooth:
         assert site2.size == n_edges
         cdef EnergyTermType_dtype *wptr = NULL
         if weights is not None:
-            wptr = <EnergyTermType_dtype*>site2.data
+            wptr = <EnergyTermType_dtype*>weights.data
         self.thisptr.addEdges(<SiteID_dtype*>site1.data, <SiteID_dtype*>site2.data, n_edges, smooth_func_id, wptr)
 
     def expansion(self, int n_iterations):
