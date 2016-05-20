@@ -72,7 +72,7 @@ copyDataCost(EnergyTermType *dataArray)
 
 void
 GCoptMultiSmooth::
-addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id)
+addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id, EnergyTermType *weights)
 {
     for(int idx=0;idx<n_edges;++idx){
 	if(smooth_func_id >= m_nSmoothArrays){
@@ -86,7 +86,8 @@ addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id)
 	    siteB = siteA;
 	    siteA = tmp;
 	}
-	setNeighbors(siteA, siteB);
+	EnergyTermType w = weights ? weights[idx] : 1.0;
+	setNeighbors(siteA, siteB, w);
 	m_edgeFuncID[Edge(siteA, siteB)] = smooth_func_id;
     }
 }

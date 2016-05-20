@@ -15,7 +15,8 @@ cdef extern from "GCoptMultiSmooth.h":
     cdef cppclass GCoptMultiSmooth:
         GCoptMultiSmooth(int n_vertices, int n_labels, int n_smoothFuncs) except +
         void copyDataCost(EnergyTermType_dtype *) except +
-        void addEdges(SiteID_dtype *site1, SiteID_dtype *site2, int n_edges, FuncID_dtype smooth_func_id) except +
+        void addEdges(SiteID_dtype *site1, SiteID_dtype *site2, int n_edges, FuncID_dtype smooth_func_id,
+                      EnergyTermType_dtype *weights) except +
         FuncID_dtype addSmoothCost(EnergyTermType_dtype *) except +
         bool alpha_expansion(LabelID_dtype alpha_label) except +
         void expansion(int n_iterations) except +
@@ -71,10 +72,14 @@ cdef class PyGCoptMultiSmooth:
     def addEdges(self,
                  np.ndarray[SiteID_dtype, ndim=1, mode='c'] site1,
                  np.ndarray[SiteID_dtype, ndim=1, mode='c'] site2,
-                 FuncID_dtype smooth_func_id):
+                 FuncID_dtype smooth_func_id,
+                 np.ndarray[EnergyTermType_dtype, ndim=1, mode='c'] weights=None):
         cdef int n_edges = site1.size
         assert site2.size == n_edges
-        self.thisptr.addEdges(<SiteID_dtype*>site1.data, <SiteID_dtype*>site2.data, n_edges, smooth_func_id)
+        cdef EnergyTermType_dtype *wptr = NULL
+        if weights is not None:
+            wptr = <EnergyTermType_dtype*>site2.data
+        self.thisptr.addEdges(<SiteID_dtype*>site1.data, <SiteID_dtype*>site2.data, n_edges, smooth_func_id, wptr)
 
     def expansion(self, int n_iterations):
         self.thisptr.expansion(n_iterations)

@@ -29,7 +29,8 @@ public:
     virtual ~GCoptMultiSmooth();
 
     // void addEdge(SiteID site1, SiteID site2, FuncID smooth_func_id);
-    void addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id);
+    void addEdges(SiteID *site1, SiteID *site2, int n_edges, FuncID smooth_func_id,
+		  EnergyTermType *weights=NULL);
 
     void copyDataCost(EnergyTermType *dataArray);
 
