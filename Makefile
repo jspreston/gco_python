@@ -1,5 +1,5 @@
 gco_python: gco_src
-	python setup.py build
+	CFLAGS="-O3" python setup.py build
 
 gco-v3.0.zip:
 	wget http://vision.csd.uwo.ca/code/gco-v3.0.zip

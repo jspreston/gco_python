@@ -115,8 +115,8 @@ cdef class PyGCoptMultiSmooth:
                                <LabelID_dtype*>labels.data,
                                n_labels)
 
-    def setAllLabels(self,
-                     np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels):
+    def setLabeling(self,
+                    np.ndarray[LabelID_dtype, ndim=1, mode='c'] labels):
         assert labels.size == self.n_vertices
         self.thisptr.setAllLabels(<LabelID_dtype*>labels.data)
 
