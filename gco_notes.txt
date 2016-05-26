@@ -1,0 +1,27 @@
+m_neighbors:
+
+type: LinkedBlockList*
+a m_num_sites-length array of linked lists of neighbors.  Each edge occurs in both neighbors' linked lists.
+
+m_numNeighbors:
+type: SiteID*
+a m_num_sites-length array of integers listing the number of neighbors for each site (set in finalizeNeighbors())
+
+m_neighborsIndexes:
+type: SiteID **
+
+Set up by finalizeNeighbors(), this is a m_num_sites-length array of arrays listing the sites (SiteID indices) of neighbors for each site
+
+m_neighborsWeights:
+type: EnergyTermType **
+
+Set up by finalizeNeighbors(), this is a m_num_sites-length array of arrays listing the weights of edges for each site
+
+
+---------------
+
+void specializeSmoothCostFunctor(...) takes a 'UserFunctor' (templated type) and sets up m_smoothcostFn (void* type), m_smoothcostFnDelete (void function taking void* arg), m_giveSmoothEnergyInternal, m_setupSmoothCostsExpansion, and m_setupSmoothCostsSwap
+
+m_smoothcostFn:
+type: void*, cast to SmoothCostT*
+supports ob->compute(SiteT, SiteT, LabelT, LabelT)
